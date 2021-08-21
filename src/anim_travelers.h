@@ -6,6 +6,7 @@
 #include "settings.h"
 #include "traveler.h"
 #include "animation.h"
+#include "color_palette.h"
 
 class AnimationTravelers : public Animation
 {
@@ -19,9 +20,15 @@ private:
         Traveler(4),
         Traveler(5)};
 
+    ColorPalette colorPalette = ColorPalette();
+
 public:
     void setup(CRGB leds[])
     {
+        for (int i = 0; i < numTravelers; i++)
+        {
+            travelers[i].color = colorPalette.GetNextColor(numTravelers);
+        }
     }
 
     void loop(CRGB leds[])

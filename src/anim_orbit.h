@@ -7,6 +7,7 @@
 #include "data.h"
 #include "animation.h"
 #include "traveler.h"
+#include "color_palette.h"
 
 class AnimationOrbit : public Animation
 {
@@ -26,6 +27,8 @@ private:
         Traveler(10),
         Traveler(11)};
 
+    ColorPalette colorPalette = ColorPalette();
+
 public:
     void setup(CRGB leds[])
     {
@@ -35,23 +38,23 @@ public:
         travelers[0].animDir = DIR_E;
         travelers[0].steering = STEERING_CW;
 
-        travelers[1].segment = segments[30];
-        travelers[1].pos = 309;
+        travelers[1].segment = segments[4];
+        travelers[1].pos = 40;
         travelers[1].animDir = DIR_E;
         travelers[1].steering = STEERING_CW;
 
-        travelers[2].segment = segments[21];
-        travelers[2].pos = 210;
-        travelers[2].animDir = DIR_W;
+        travelers[2].segment = segments[30];
+        travelers[2].pos = 309;
+        travelers[2].animDir = DIR_E;
         travelers[2].steering = STEERING_CW;
 
-        travelers[3].segment = segments[4];
-        travelers[3].pos = 40;
-        travelers[3].animDir = DIR_E;
+        travelers[3].segment = segments[29];
+        travelers[3].pos = 299;
+        travelers[3].animDir = DIR_W;
         travelers[3].steering = STEERING_CW;
 
-        travelers[4].segment = segments[29];
-        travelers[4].pos = 299;
+        travelers[4].segment = segments[21];
+        travelers[4].pos = 210;
         travelers[4].animDir = DIR_W;
         travelers[4].steering = STEERING_CW;
 
@@ -65,23 +68,23 @@ public:
         travelers[6].animDir = DIR_W;
         travelers[6].steering = STEERING_CCW;
 
-        travelers[7].segment = segments[35];
-        travelers[7].pos = 350;
+        travelers[7].segment = segments[8];
+        travelers[7].pos = 89;
         travelers[7].animDir = DIR_W;
         travelers[7].steering = STEERING_CCW;
 
-        travelers[8].segment = segments[17];
-        travelers[8].pos = 179;
-        travelers[8].animDir = DIR_E;
+        travelers[8].segment = segments[35];
+        travelers[8].pos = 350;
+        travelers[8].animDir = DIR_W;
         travelers[8].steering = STEERING_CCW;
 
-        travelers[9].segment = segments[8];
-        travelers[9].pos = 89;
-        travelers[9].animDir = DIR_W;
+        travelers[9].segment = segments[34];
+        travelers[9].pos = 340;
+        travelers[9].animDir = DIR_E;
         travelers[9].steering = STEERING_CCW;
 
-        travelers[10].segment = segments[34];
-        travelers[10].pos = 340;
+        travelers[10].segment = segments[17];
+        travelers[10].pos = 179;
         travelers[10].animDir = DIR_E;
         travelers[10].steering = STEERING_CCW;
 
@@ -89,6 +92,11 @@ public:
         travelers[11].pos = 330;
         travelers[11].animDir = DIR_E;
         travelers[11].steering = STEERING_CCW;
+
+        for (int i = 0; i < numTravelers; i++)
+        {
+            travelers[i].color = colorPalette.GetNextColor(numTravelers);
+        }
     }
 
     void loop(CRGB leds[])
