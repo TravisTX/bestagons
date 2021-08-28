@@ -18,11 +18,21 @@ public:
   Traveler(int num)
   {
     num = num;
-    Segment segment = segments[random(0, NUM_SEGMENTS)];
+    segment = segments[random(0, NUM_SEGMENTS)];
     pos = segment.LowLed;
     animDir = random(0, 1) == 0 ? DIR_E : DIR_W;
 
     color = CHSV(random(1, 255), 255, 255);
+  }
+
+  Traveler(int num, int segmentNum, int pos, int animDir, int steering, CRGB color)
+  {
+    this->num = num;
+    this->segment = segments[segmentNum];
+    this->pos = pos;
+    this->animDir = animDir;
+    this->steering = steering;
+    this->color = color;
   }
 
   void move()
