@@ -9,6 +9,7 @@
 
 #include "anim_orbit.h"
 #include "anim_travelers.h"
+#include "anim_debug1.h"
 #include "data.h"
 
 CRGB leds[NUM_LEDS];
