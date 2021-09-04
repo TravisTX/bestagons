@@ -79,13 +79,28 @@ public:
 
   ColorPalette()
   {
-    RandomPalette();
+    SetPalette("");
   }
 
-  void RandomPalette()
+  void SetPalette(String paletteName)
   {
-    currentPalette = allPalettes[random(0, numPalettes)];
-    currentPalette = partyPal;
+    if (paletteName == "blue")
+      currentPalette = bluePal;
+    else if (paletteName == "lava")
+      currentPalette = lavaPal;
+    else if (paletteName == "forest")
+      currentPalette = forestPal;
+    else if (paletteName == "party")
+      currentPalette = partyPal;
+    else if (paletteName == "joker")
+      currentPalette = jokerFixedPal;
+    else if (paletteName == "bluePurp")
+      currentPalette = bluePurpFixedPal;
+    else if (paletteName == "royal")
+      currentPalette = royalFixedPal;
+    else
+      currentPalette = allPalettes[random(0, numPalettes)];
+
     stepOverride = -1;
     for (int i = 0; i < numFixedPalettes; i++)
     {

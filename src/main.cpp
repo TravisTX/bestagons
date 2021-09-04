@@ -5,23 +5,26 @@
 
 #if OTA
 #include "OTA.h"
+#include "http_server.h"
 #endif
 
 #include "anim_orbit.h"
 #include "anim_travelers.h"
 #include "anim_debug1.h"
 #include "data.h"
+#include "color_palette.h"
 
 CRGB leds[NUM_LEDS];
 
 extern CRGBPalette16 myRedWhiteBluePalette;
 extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
 
+ColorPalette *colorPalette = new ColorPalette();
 Animation *animation;
 unsigned long animationEnd;
 
 //------------ forward declarations ----------//
-Animation *getAnimation();
+Animation *getAnimation(String newAnimation = "");
 
 void setup()
 {
@@ -30,10 +33,10 @@ void setup()
 
 #if OTA
   setupOTA("Bestagons", WIFI_SSID, WIFI_PW);
+  http_server_setup();
 #endif
   randomSeed(4); // chosen by fair dice roll, guaranteed to be random
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS);
 
   for (int i = 0; i < NUM_LEDS; i++)
   {
@@ -47,25 +50,60 @@ void loop()
 {
 #if OTA
   ArduinoOTA.handle();
+  http_server_loop();
 #endif
-
   animation->loop(leds);
 
   if (ANIM_MIN_DURATION > -1 && millis() > animationEnd && animation->checkStoppingPoint())
   {
-    animation = getAnimation();
-    animation->loop(leds);
+    changeAnimation = true;
+    // random
+    sprintf(changeAnimationValue, "");
   }
 
-  FastLED.delay(1000 / UPDATES_PER_SECOND);
+  if (changeAnimation)
+  {
+    animation = getAnimation(changeAnimationValue);
+    animation->loop(leds);
+
+    // reset
+    changeAnimation = false;
+    sprintf(changeAnimationValue, "");
+  }
+
+  if (changePalette)
+  {
+    colorPalette->SetPalette(changePaletteValue);
+    animation->setup(leds, colorPalette);
+
+    // reset
+    changePalette = false;
+    sprintf(changePaletteValue, "");
+  }
+
+  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-Animation *getAnimation()
+Animation *getAnimation(String newAnimation)
 {
   debug_println("getting new animation");
 
-  int animNum = random(1, 3);
+  int animNum;
   Animation *anim;
+
+  if (newAnimation == "travelers")
+  {
+    animNum = 1;
+  }
+  else if (newAnimation == "orbit")
+  {
+    animNum = 2;
+  }
+  else
+  {
+    animNum = random(1, 3);
+  }
 
   switch (animNum)
   {
@@ -79,10 +117,7 @@ Animation *getAnimation()
     debug_println("invalid animNum");
   }
 
-  // debug
-  anim = new AnimationTravelers();
-
-  anim->setup(leds);
+  anim->setup(leds, colorPalette);
   animationEnd = millis() + ANIM_MIN_DURATION;
   return anim;
 }

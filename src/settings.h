@@ -8,11 +8,17 @@
 #define SEGMENT_COUNT 37
 #define LEDS_PER_SEGMENT 10
 #define NUM_LEDS 370 // SEGMENT_COUNT * LEDS_PER_SEGMENT
-#define BRIGHTNESS 64
+int BRIGHTNESS = 50;
 #define LED_TYPE WS2812B
 #define COLOR_ORDER GRB
-#define UPDATES_PER_SECOND 50
+int FRAMES_PER_SECOND = 50;
 #define ANIM_MIN_DURATION -1
+
+// commands coming from http
+bool changeAnimation = false;
+char changeAnimationValue[15] = "";
+bool changePalette = false;
+char changePaletteValue[10] = "";
 
 #define debug_begin(...) do { if (DEBUG) { Serial.begin(__VA_ARGS__); while(!Serial); }} while (0)
 #define debug_print(...) do { if (DEBUG) Serial.print(__VA_ARGS__); } while (0)

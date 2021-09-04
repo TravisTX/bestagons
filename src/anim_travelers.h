@@ -20,14 +20,14 @@ private:
         Traveler(4),
         Traveler(5)};
 
-    ColorPalette colorPalette = ColorPalette();
+    ColorPalette *colorPalette;
 
 public:
-    void setup(CRGB leds[])
+    void setup(CRGB leds[], ColorPalette *colorPalette)
     {
         for (int i = 0; i < numTravelers; i++)
         {
-            travelers[i].color = colorPalette.GetNextColor(numTravelers);
+            travelers[i].color = colorPalette->GetNextColor(numTravelers);
         }
     }
 

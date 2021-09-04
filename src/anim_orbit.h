@@ -12,26 +12,33 @@
 class AnimationOrbit : public Animation
 {
 private:
-    ColorPalette colorPalette = ColorPalette();
+    ColorPalette *colorPalette;
     int numTravelers = 12;
     Traveler travelers[12] = {
-        Traveler(0, 27, 270, DIR_E, STEERING_CW, colorPalette.GetNextColor(numTravelers)),
-        Traveler(1, 4, 40, DIR_E, STEERING_CW, colorPalette.GetNextColor(numTravelers)),
-        Traveler(2, 30, 309, DIR_E, STEERING_CW, colorPalette.GetNextColor(numTravelers)),
-        Traveler(3, 29, 299, DIR_W, STEERING_CW, colorPalette.GetNextColor(numTravelers)),
-        Traveler(4, 21, 210, DIR_W, STEERING_CW, colorPalette.GetNextColor(numTravelers)),
-        Traveler(5, 28, 289, DIR_W, STEERING_CW, colorPalette.GetNextColor(numTravelers)),
-        Traveler(6, 32, 329, DIR_W, STEERING_CCW, colorPalette.GetNextColor(numTravelers)),
-        Traveler(7, 8, 89, DIR_W, STEERING_CCW, colorPalette.GetNextColor(numTravelers)),
-        Traveler(8, 35, 350, DIR_W, STEERING_CCW, colorPalette.GetNextColor(numTravelers)),
-        Traveler(9, 34, 340, DIR_E, STEERING_CCW, colorPalette.GetNextColor(numTravelers)),
-        Traveler(10, 17, 179, DIR_E, STEERING_CCW, colorPalette.GetNextColor(numTravelers)),
-        Traveler(11, 33, 330, DIR_E, STEERING_CCW, colorPalette.GetNextColor(numTravelers))
+        Traveler(0, 27, 270, DIR_E, STEERING_CW, CRGB::Red),
+        Traveler(1, 4, 40, DIR_E, STEERING_CW, CRGB::Red),
+        Traveler(2, 30, 309, DIR_E, STEERING_CW, CRGB::Red),
+        Traveler(3, 29, 299, DIR_W, STEERING_CW, CRGB::Red),
+        Traveler(4, 21, 210, DIR_W, STEERING_CW, CRGB::Red),
+        Traveler(5, 28, 289, DIR_W, STEERING_CW, CRGB::Red),
+        Traveler(6, 32, 329, DIR_W, STEERING_CCW, CRGB::Red),
+        Traveler(7, 8, 89, DIR_W, STEERING_CCW, CRGB::Red),
+        Traveler(8, 35, 350, DIR_W, STEERING_CCW, CRGB::Red),
+        Traveler(9, 34, 340, DIR_E, STEERING_CCW, CRGB::Red),
+        Traveler(10, 17, 179, DIR_E, STEERING_CCW, CRGB::Red),
+        Traveler(11, 33, 330, DIR_E, STEERING_CCW, CRGB::Red)
     };
 
 public:
-    void setup(CRGB leds[])
+    void setup(CRGB leds[], ColorPalette *colorPalette)
     {
+        this->colorPalette = colorPalette;
+
+        for (int i = 0; i < numTravelers; i++)
+        {
+            travelers[i].color = colorPalette->GetNextColor(numTravelers);
+            leds[travelers[i].pos] = travelers[i].color;
+        }
     }
 
     void loop(CRGB leds[])

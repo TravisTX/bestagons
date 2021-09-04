@@ -11,18 +11,19 @@
 class AnimationDebug1 : public Animation
 {
 private:
-    ColorPalette colorPalette = ColorPalette();
+    ColorPalette *colorPalette;
 
 public:
-    void setup(CRGB leds[])
+    void setup(CRGB leds[], ColorPalette *colorPalette)
     {
+        this->colorPalette = colorPalette;
     }
 
     void loop(CRGB leds[])
     {
         for (int i = 0; i < NUM_LEDS; i++)
         {
-            leds[i] = colorPalette.GetNextColor(NUM_LEDS);
+            leds[i] = colorPalette->GetNextColor(NUM_LEDS);
         }
     }
 
