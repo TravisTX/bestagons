@@ -56,7 +56,6 @@ void loop()
     animation->loop(leds);
   }
 
-  FastLED.show();
   FastLED.delay(1000 / UPDATES_PER_SECOND);
 }
 
