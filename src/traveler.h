@@ -15,6 +15,10 @@ public:
   Segment segment = segments[0];
   int steering;
 
+  int path[10];
+  int pathSize;
+  int pathPos = 0;
+
   Traveler(int num)
   {
     num = num;
@@ -25,14 +29,24 @@ public:
     color = CHSV(random(1, 255), 255, 255);
   }
 
-  Traveler(int num, int segmentNum, int pos, int animDir, int steering, CRGB color)
+  Traveler(int num, int segmentNum, int pos, int animDir, int steering)
   {
     this->num = num;
     this->segment = segments[segmentNum];
     this->pos = pos;
     this->animDir = animDir;
     this->steering = steering;
-    this->color = color;
+  }
+
+  Traveler(int num, int segmentNum, int pos, int animDir, int steering, std::initializer_list<int> path, int pathSize)
+  {
+    this->num = num;
+    this->segment = segments[segmentNum];
+    this->pos = pos;
+    this->animDir = animDir;
+    this->steering = steering;
+    std::copy(path.begin(), path.end(), this->path);
+    this->pathSize = pathSize;
   }
 
   void move()
@@ -50,6 +64,8 @@ public:
 
   void hop()
   {
+    debug_print(num);
+    debug_println(" hopping");
     switch (steering)
     {
       case STEERING_RAND:
@@ -60,6 +76,9 @@ public:
         break;
       case STEERING_CCW:
         hopCounterClockWise();
+        break;
+      case STEERING_PATH:
+        hopPath();
         break;
     }
   }
@@ -124,6 +143,21 @@ public:
     finishHop(vertNum, nextSegNum);
   }
 
+  void hopPath()
+  {
+    if (pathPos >= pathSize - 1)
+      return;
+    int vertex = (animDir == segment.Dir) ? segment.HighVertex : segment.LowVertex;
+    int nextSegNum = path[++pathPos];
+    debug_print(" seg: ");
+    debug_print(segment.Num);
+    debug_print(" vertex: ");
+    debug_print(vertex);
+    debug_print(" nextSeg: ");
+    debug_println(nextSegNum);
+    finishHop(vertex, nextSegNum);
+  }
+
   void finishHop(int vertex, int nextSegNum)
   {
         segment = segments[nextSegNum];
@@ -137,7 +171,6 @@ public:
           pos = segment.HighLed;
           animDir = segment.Dir == DIR_E ? DIR_W : DIR_E;
         }
-
   }
 
 };

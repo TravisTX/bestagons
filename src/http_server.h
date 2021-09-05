@@ -10,8 +10,8 @@ ESP8266WebServer server(80);
 char message[100];
 
 void handleRoot() {
-  char temp[2100];
-  snprintf(temp, 2100,
+  char temp[2200];
+  snprintf(temp, 2200,
 
            "<html>\
   <head>\
@@ -32,6 +32,8 @@ void handleRoot() {
         <input type=\"submit\" name=\"anim\" value=\"random\">\
         <input type=\"submit\" name=\"anim\" value=\"travelers\">\
         <input type=\"submit\" name=\"anim\" value=\"orbit\">\
+        <input type=\"submit\" name=\"anim\" value=\"sparkles\">\
+        <input type=\"submit\" name=\"anim\" value=\"explosion\">\
         </form>\
     </div>\
     <div class=\"section\">\

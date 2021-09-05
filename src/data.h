@@ -106,5 +106,6 @@ const int verticies[30][6] = {
 const int STEERING_RAND = 0;
 const int STEERING_CW = 1;
 const int STEERING_CCW = 2;
+const int STEERING_PATH = 3;
 
 #endif

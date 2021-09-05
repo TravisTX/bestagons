@@ -8,7 +8,9 @@
 #include "http_server.h"
 #endif
 
+#include "anim_explosion.h"
 #include "anim_orbit.h"
+#include "anim_sparkles.h"
 #include "anim_travelers.h"
 #include "anim_debug1.h"
 #include "data.h"
@@ -57,8 +59,9 @@ void loop()
   if (ANIM_MIN_DURATION > -1 && millis() > animationEnd && animation->checkStoppingPoint())
   {
     changeAnimation = true;
+    changePalette = true;
     // random
-    sprintf(changeAnimationValue, "");
+    changeAnimationValue[0] = 0;
   }
 
   if (changeAnimation)
@@ -68,7 +71,7 @@ void loop()
 
     // reset
     changeAnimation = false;
-    sprintf(changeAnimationValue, "");
+    changeAnimationValue[0] = 0;
   }
 
   if (changePalette)
@@ -78,7 +81,7 @@ void loop()
 
     // reset
     changePalette = false;
-    sprintf(changePaletteValue, "");
+    changePaletteValue[0] = 0;
   }
 
   FastLED.setBrightness(BRIGHTNESS);
@@ -93,17 +96,15 @@ Animation *getAnimation(String newAnimation)
   Animation *anim;
 
   if (newAnimation == "travelers")
-  {
     animNum = 1;
-  }
   else if (newAnimation == "orbit")
-  {
     animNum = 2;
-  }
+  else if (newAnimation == "sparkles")
+    animNum = 3;
+  else if (newAnimation == "explosion")
+    animNum = 4;
   else
-  {
-    animNum = random(1, 3);
-  }
+    animNum = random(1, 5);
 
   switch (animNum)
   {
@@ -113,8 +114,15 @@ Animation *getAnimation(String newAnimation)
   case 2:
     anim = new AnimationOrbit();
     break;
+  case 3:
+    anim = new AnimationSparkles();
+    break;
+  case 4:
+    anim = new AnimationExplosion();
+    break;
   default:
     debug_println("invalid animNum");
+    anim = new AnimationTravelers();
   }
 
   anim->setup(leds, colorPalette);
