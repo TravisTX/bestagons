@@ -35,7 +35,7 @@ void setup()
   setupOTA("Bestagons", WIFI_SSID, WIFI_PW);
   http_server_setup();
 #endif
-  randomSeed(4); // chosen by fair dice roll, guaranteed to be random
+  randomSeed(analogRead(0));
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
   for (int i = 0; i < NUM_LEDS; i++)
