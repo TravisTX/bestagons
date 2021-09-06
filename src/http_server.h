@@ -9,11 +9,8 @@ ESP8266WebServer server(80);
 
 char message[100];
 
-void handleRoot() {
-  char temp[2200];
-  snprintf(temp, 2200,
-
-           "<html>\
+const char htmlTemplate[] PROGMEM = "\
+           <html>\
   <head>\
     <title>Bestagons!</title>\
     <style>\
@@ -66,11 +63,13 @@ void handleRoot() {
         </form>\
     </div>\
   </body>\
-</html>",
-           message, BRIGHTNESS, FRAMES_PER_SECOND
-          );
-  server.send(200, "text/html", temp);
-  sprintf(message, "");
+</html>";
+
+void handleRoot() {
+  char buffer[2300];
+  sprintf_P(buffer, htmlTemplate, message, BRIGHTNESS, FRAMES_PER_SECOND);
+  server.send(200, "text/html", buffer);
+    message[0] = 0;
 }
 
 void handleNotFound() {
