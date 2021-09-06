@@ -15,7 +15,7 @@ public:
   Segment segment = segments[0];
   int steering;
 
-  int path[10];
+  int path[50];
   int pathSize;
   int pathPos = 0;
 
@@ -79,6 +79,9 @@ public:
         break;
       case STEERING_PATH:
         hopPath();
+        break;
+      case STEERING_PATH_PINGPONG:
+        hopPathPingPong();
         break;
     }
   }
@@ -156,6 +159,57 @@ public:
     debug_print(" nextSeg: ");
     debug_println(nextSegNum);
     finishHop(vertex, nextSegNum);
+  }
+
+  void hopPathRepeat()
+  {
+    if (pathPos >= pathSize - 1)
+    {
+      pathPos = 0;
+      int nextSegNum = path[pathPos];
+      Segment nextSegment = segments[nextSegNum];
+      int vertex = (animDir == nextSegment.Dir) ? nextSegment.LowVertex : nextSegment.HighVertex;
+      finishHop(vertex, nextSegNum);
+      return;
+    }
+
+    hopPath();
+  }
+
+  void revereseArray(int arr[], int size)
+  {
+      int start = 0;
+      int end = size - 1;
+      while (start < end)
+      {
+          int temp = arr[start];
+          arr[start] = arr[end];
+          arr[end] = temp;
+          start++;
+          end--;
+      }
+  }
+
+  void hopPathPingPong()
+  {
+    if (pathPos >= pathSize - 1)
+    {
+      animDir = animDir == DIR_W ? DIR_E : DIR_W;
+      revereseArray(path, pathSize);
+      pathPos = 0;
+      debug_print("newdir: ");
+      debug_print(animDir);
+      debug_print(" newpath: ");
+      for(int i = 0; i < pathSize; i++)
+      {
+        debug_print(path[i]);
+        debug_print(",");
+      }
+      debug_println("");
+      return;
+    }
+
+    hopPath();
   }
 
   void finishHop(int vertex, int nextSegNum)

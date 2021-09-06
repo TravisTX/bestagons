@@ -8,6 +8,8 @@
 #include "http_server.h"
 #endif
 
+#include "anim_cylon.h"
+#include "anim_cylonvert.h"
 #include "anim_explosion.h"
 #include "anim_orbit.h"
 #include "anim_sparkles.h"
@@ -103,8 +105,12 @@ Animation *getAnimation(String newAnimation)
     animNum = 3;
   else if (newAnimation == "explosion")
     animNum = 4;
+  else if (newAnimation == "cylon")
+    animNum = 5;
+  else if (newAnimation == "cylonVert")
+    animNum = 6;
   else
-    animNum = random(1, 5);
+    animNum = random(1, 7);
 
   switch (animNum)
   {
@@ -119,6 +125,12 @@ Animation *getAnimation(String newAnimation)
     break;
   case 4:
     anim = new AnimationExplosion();
+    break;
+  case 5:
+    anim = new AnimationCylon();
+    break;
+  case 6:
+    anim = new AnimationCylonVert();
     break;
   default:
     debug_println("invalid animNum");
