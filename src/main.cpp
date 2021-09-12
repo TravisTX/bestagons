@@ -20,9 +20,6 @@
 
 CRGB leds[NUM_LEDS];
 
-extern CRGBPalette16 myRedWhiteBluePalette;
-extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
-
 ColorPalette *colorPalette = new ColorPalette();
 Animation *animation;
 unsigned long animationEnd;
@@ -47,7 +44,7 @@ void setup()
     leds[i] = CRGB::Black;
   }
   FastLED.show();
-  animation = getAnimation();
+  animation = getAnimation("travelers");
 }
 
 void loop()
@@ -90,52 +87,49 @@ void loop()
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
+Animation *getRandomAnimation()
+{
+  int animNum = random(1, 6);
+  switch (animNum)
+  {
+  case 1:
+    return new AnimationTravelers();
+  case 2:
+    return new AnimationOrbit();
+  case 3:
+    return new AnimationSparkles();
+  case 4:
+    return new AnimationCylon();
+  case 5:
+    return new AnimationCylonVert();
+  default:
+    debug_println("invalid animNum");
+    return new AnimationTravelers();
+  }
+}
+
 Animation *getAnimation(String newAnimation)
 {
   debug_println("getting new animation");
 
-  int animNum;
   Animation *anim;
 
   if (newAnimation == "travelers")
-    animNum = 1;
+    anim = new AnimationTravelers();
   else if (newAnimation == "orbit")
-    animNum = 2;
-  else if (newAnimation == "sparkles")
-    animNum = 3;
-  else if (newAnimation == "explosion")
-    animNum = 4;
-  else if (newAnimation == "cylon")
-    animNum = 5;
-  else if (newAnimation == "cylonVert")
-    animNum = 6;
-  else
-    animNum = random(1, 7);
-
-  switch (animNum)
-  {
-  case 1:
-    anim = new AnimationTravelers();
-    break;
-  case 2:
     anim = new AnimationOrbit();
-    break;
-  case 3:
+  else if (newAnimation == "sparkles")
     anim = new AnimationSparkles();
-    break;
-  case 4:
+  else if (newAnimation == "explosion")
     anim = new AnimationExplosion();
-    break;
-  case 5:
+  else if (newAnimation == "cylon")
     anim = new AnimationCylon();
-    break;
-  case 6:
+  else if (newAnimation == "cylonVert")
     anim = new AnimationCylonVert();
-    break;
-  default:
-    debug_println("invalid animNum");
-    anim = new AnimationTravelers();
-  }
+  else if (newAnimation == "debug1")
+    anim = new AnimationDebug1();
+  else
+    anim = getRandomAnimation();
 
   anim->setup(leds, colorPalette);
   animationEnd = millis() + ANIM_MIN_DURATION;

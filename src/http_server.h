@@ -33,6 +33,7 @@ const char htmlTemplate[] PROGMEM = "\
         <input type=\"submit\" name=\"anim\" value=\"explosion\">\
         <input type=\"submit\" name=\"anim\" value=\"cylon\">\
         <input type=\"submit\" name=\"anim\" value=\"cylonVert\">\
+        <input type=\"submit\" name=\"anim\" value=\"debug1\">\
         </form>\
     </div>\
     <div class=\"section\">\
@@ -68,7 +69,7 @@ const char htmlTemplate[] PROGMEM = "\
 </html>";
 
 void handleRoot() {
-  char buffer[2300];
+  char buffer[2400];
   sprintf_P(buffer, htmlTemplate, message, BRIGHTNESS, FRAMES_PER_SECOND);
   server.send(200, "text/html", buffer);
     message[0] = 0;
