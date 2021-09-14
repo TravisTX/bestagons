@@ -23,7 +23,7 @@ public:
   {
     num = num;
     segment = segments[random(0, NUM_SEGMENTS)];
-    pos = segment.LowLed;
+    pos = random(segment.LowLed, segment.HighLed);
     animDir = random(0, 1) == 0 ? DIR_E : DIR_W;
 
     color = CHSV(random(1, 255), 255, 255);
