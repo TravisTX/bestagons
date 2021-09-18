@@ -1,11 +1,12 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include <ESPAsyncTCP.h>
 #include <WiFiClient.h>
-#include <ESP8266WebServer.h>
+#include <ESPAsyncWebServer.h>
 
 #include "settings.h"
 
-ESP8266WebServer server(80);
+AsyncWebServer server(80);
 
 char message[100];
 
@@ -14,7 +15,7 @@ const char htmlTemplate[] PROGMEM = "\
   <head>\
     <title>Bestagons!</title>\
     <style>\
-      html, body { background-color: #35393b; color: #7aabff; padding: 10px; margin: 0; }\
+      html, body { background-color: #35393b; color: #7aabff; padding: 10px; margin: 0; font-family: Sans-Serif; }\
       input[type=\"submit\"] {width: 100px; padding: 10px; background-color: #181a1b; color: #e8e6e3; }\
       .section {background: #222; padding: 5px; margin-bottom:10px;}\
       .message {background: #404b5f; color: #e8e6e3; padding: 5px;}\
@@ -22,9 +23,9 @@ const char htmlTemplate[] PROGMEM = "\
   </head>\
   <body>\
     <h1>Bestagons!</h1>\
-    <p class=\"message\">%s</p>\
+    <p class=\"message\">%MESSAGE%</p>\
     <div class=\"section\">\
-        <h2>Change Animation</h2>\
+        <h2>Animation</h2>\
         <form method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"/anim\">\
         <input type=\"submit\" name=\"anim\" value=\"random\">\
         <input type=\"submit\" name=\"anim\" value=\"travelers\">\
@@ -37,7 +38,7 @@ const char htmlTemplate[] PROGMEM = "\
         </form>\
     </div>\
     <div class=\"section\">\
-        <h2>Change Palette</h2>\
+        <h2>Palette</h2>\
         <form method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"/palette\">\
         <input type=\"submit\" name=\"palette\" value=\"random\">\
         <input type=\"submit\" name=\"palette\" value=\"blue\">\
@@ -50,139 +51,114 @@ const char htmlTemplate[] PROGMEM = "\
         </form>\
     </div>\
     <div class=\"section\">\
-        <h2>Change Brightness</h2>\
+        <h2>Brightness</h2>\
         <form method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"/brightness\">\
         <input type=\"submit\" name=\"down\" value=\"-\">\
-        <span>%i</span>\
+        <span>%BRIGHTNESS%</span>\
         <input type=\"submit\" name=\"up\" value=\"+\">\
         </form>\
     </div>\
     <div class=\"section\">\
-        <h2>Change FPS</h2>\
+        <h2>FPS</h2>\
         <form method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"/fps\">\
         <input type=\"submit\" name=\"down\" value=\"-\">\
-        <span>%i</span>\
+        <span>%FPS%</span>\
         <input type=\"submit\" name=\"up\" value=\"+\">\
         </form>\
     </div>\
   </body>\
 </html>";
 
-void handleRoot() {
-  char buffer[2400];
-  sprintf_P(buffer, htmlTemplate, message, BRIGHTNESS, FRAMES_PER_SECOND);
-  server.send(200, "text/html", buffer);
-    message[0] = 0;
+String htmlProcessor(const String &var)
+{
+  if (var == "MESSAGE")
+    return message;
+  if (var == "BRIGHTNESS")
+    return String(BRIGHTNESS);
+  if (var == "FPS")
+    return String(FRAMES_PER_SECOND);
+  return String();
 }
 
-void handleNotFound() {
-  String output = "File Not Found\n\n";
-  output += "URI: ";
-  output += server.uri();
-  output += "\nMethod: ";
-  output += (server.method() == HTTP_GET) ? "GET" : "POST";
-  output += "\nArguments: ";
-  output += server.args();
-  output += "\n";
+void handleRoot(AsyncWebServerRequest *request)
+{
+  request->send_P(200, "text/html", htmlTemplate, htmlProcessor);
+  message[0] = 0;
+}
 
-  for (uint8_t i = 0; i < server.args(); i++) {
-    output += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+void handleNotFound(AsyncWebServerRequest *request)
+{
+  request->send(404, "text/plain", "Not found");
+}
+
+void handleAnim(AsyncWebServerRequest *request)
+{
+  changeAnimation = true;
+
+  String value = request->getParam("anim", true)->value();
+  sprintf(changeAnimationValue, "%s", value);
+  sprintf(message, "Changed animation to %s", value);
+
+  request->redirect("/");
+}
+
+void handlePal(AsyncWebServerRequest *request)
+{
+  changePalette = true;
+  String value = request->getParam("palette", true)->value();
+  sprintf(changePaletteValue, "%s", value);
+  sprintf(message, "Changed palette to %s", value);
+  request->redirect("/");
+}
+
+void handleBrightness(AsyncWebServerRequest *request)
+{
+  if (request->hasParam("up", true))
+  {
+    BRIGHTNESS += 25;
+    if (BRIGHTNESS > 255)
+      BRIGHTNESS = 255;
   }
-
-  server.send(404, "text/plain", output);
-}
-
-void changeAnim() {
-  if (server.method() != HTTP_POST) {
-    server.send(405, "text/plain", "Method Not Allowed");
-  } else {
-    changeAnimation = true;
-    for (uint8_t i = 0; i < server.args(); i++) {
-        if (server.argName(i) == "anim")
-        {
-            sprintf(changeAnimationValue, "%s", server.arg(i));
-            sprintf(message, "Changed animation to %s", server.arg(i));
-        }
-    }
-    server.sendHeader("Location", String("/"), true);
-    server.send ( 302, "text/plain", "");
+  if (request->hasParam("down", true))
+  {
+    BRIGHTNESS -= 25;
+    if (BRIGHTNESS < 0)
+      BRIGHTNESS = 0;
   }
+  request->redirect("/");
 }
 
-void changePal() {
-  if (server.method() != HTTP_POST) {
-    server.send(405, "text/plain", "Method Not Allowed");
-  } else {
-    changePalette = true;
-    for (uint8_t i = 0; i < server.args(); i++) {
-        if (server.argName(i) == "palette")
-        {
-            sprintf(changePaletteValue, "%s", server.arg(i));
-            sprintf(message, "Changed palette to %s", server.arg(i));
-        }
-    }
-    server.sendHeader("Location", String("/"), true);
-    server.send ( 302, "text/plain", "");
+void handleFps(AsyncWebServerRequest *request)
+{
+  if (request->hasParam("up", true))
+  {
+    FRAMES_PER_SECOND += 10;
+    if (FRAMES_PER_SECOND > 255)
+      FRAMES_PER_SECOND = 255;
   }
-}
-
-void changeBrightness() {
-  if (server.method() != HTTP_POST) {
-    server.send(405, "text/plain", "Method Not Allowed");
-  } else {
-    for (uint8_t i = 0; i < server.args(); i++) {
-        if (server.argName(i) == "up")
-        {
-            BRIGHTNESS += 10;
-            if (BRIGHTNESS > 255) BRIGHTNESS = 255;
-        }
-        if (server.argName(i) == "down")
-        {
-            BRIGHTNESS -= 10;
-            if (BRIGHTNESS < 0) BRIGHTNESS = 0;
-        }
-    }
-    server.sendHeader("Location", String("/"), true);
-    server.send ( 302, "text/plain", "");
+  if (request->hasParam("down", true))
+  {
+    FRAMES_PER_SECOND -= 10;
+    if (FRAMES_PER_SECOND < 0)
+      FRAMES_PER_SECOND = 0;
   }
-}
-
-void changeFps() {
-  if (server.method() != HTTP_POST) {
-    server.send(405, "text/plain", "Method Not Allowed");
-  } else {
-    for (uint8_t i = 0; i < server.args(); i++) {
-        if (server.argName(i) == "up")
-        {
-            FRAMES_PER_SECOND += 10;
-            if (FRAMES_PER_SECOND > 255) FRAMES_PER_SECOND = 255;
-        }
-        if (server.argName(i) == "down")
-        {
-            FRAMES_PER_SECOND -= 10;
-            if (FRAMES_PER_SECOND < 0) FRAMES_PER_SECOND = 0;
-        }
-    }
-    server.sendHeader("Location", String("/"), true);
-    server.send ( 302, "text/plain", "");
-  }
+  request->redirect("/");
 }
 
 
-void http_server_setup() {
-  server.on("/", handleRoot);
-  server.on("/anim", changeAnim);
-  server.on("/palette", changePal);
-  server.on("/brightness", changeBrightness);
-  server.on("/fps", changeFps);
-  server.on("/inline", []() {
-    server.send(200, "text/plain", "this works as well");
-  });
+
+void http_server_setup()
+{
+  server.on("/", HTTP_GET, handleRoot);
+  server.on("/anim", HTTP_POST, handleAnim);
+  server.on("/palette", HTTP_POST, handlePal);
+  server.on("/brightness", handleBrightness);
+  server.on("/fps", handleFps);
   server.onNotFound(handleNotFound);
   server.begin();
   debug_println("HTTP server started");
 }
 
-void http_server_loop() {
-  server.handleClient();
+void http_server_loop()
+{
 }
