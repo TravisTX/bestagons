@@ -23,6 +23,7 @@ CRGB leds[NUM_LEDS];
 ColorPalette *colorPalette = new ColorPalette();
 Animation *animation;
 unsigned long animationEnd;
+bool prevSystemOn = SYSTEM_ON;
 
 //------------ forward declarations ----------//
 Animation *getAnimation(String newAnimation = "");
@@ -53,6 +54,32 @@ void loop()
   ArduinoOTA.handle();
   http_server_loop();
 #endif
+
+  if (SYSTEM_ON != prevSystemOn)
+  {
+    if (SYSTEM_ON)
+    {
+      for (int i = 0; i < 100; i++)
+      {
+        animation->loop(leds);
+      }
+    }
+    else
+    {
+      for (int i = 0; i < NUM_LEDS; i++)
+      {
+        leds[i] = CRGB::Black;
+      }
+    }
+    prevSystemOn = SYSTEM_ON;
+  }
+
+  if (!SYSTEM_ON)
+  {
+    FastLED.delay(1000 / FRAMES_PER_SECOND);
+    return;
+  }
+
   animation->loop(leds);
 
   if (ANIM_MIN_DURATION > -1 && millis() > animationEnd && animation->checkStoppingPoint())

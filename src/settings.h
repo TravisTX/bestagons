@@ -13,6 +13,7 @@ int BRIGHTNESS = 50;
 #define COLOR_ORDER GRB
 int FRAMES_PER_SECOND = 50;
 #define ANIM_MIN_DURATION -1
+bool SYSTEM_ON = true;
 
 // commands coming from http
 bool changeAnimation = false;

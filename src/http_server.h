@@ -66,6 +66,14 @@ const char htmlTemplate[] PROGMEM = "\
         <input type=\"submit\" name=\"up\" value=\"+\">\
         </form>\
     </div>\
+    <div class=\"section\">\
+        <h2>System</h2>\
+        <form method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"/system\">\
+          <input type=\"submit\" name=\"off\" value=\"off\">\
+          <span>%SYSTEM_ON%</span>\
+          <input type=\"submit\" name=\"on\" value=\"on\">\
+        </form>\
+    </div>\
   </body>\
 </html>";
 
@@ -77,6 +85,8 @@ String htmlProcessor(const String &var)
     return String(BRIGHTNESS);
   if (var == "FPS")
     return String(FRAMES_PER_SECOND);
+  if (var == "SYSTEM_ON")
+    return String(SYSTEM_ON ? "on" : "off");
   return String();
 }
 
@@ -145,15 +155,33 @@ void handleFps(AsyncWebServerRequest *request)
   request->redirect("/");
 }
 
-
+void handleSystem(AsyncWebServerRequest *request)
+{
+  if (request->hasParam("on", true))
+  {
+    SYSTEM_ON = true;
+    sprintf(message, "System turned on");
+  }
+  if (request->hasParam("off", true))
+  {
+    SYSTEM_ON = false;
+    sprintf(message, "System turned off");
+  }
+  request->redirect("/");
+}
 
 void http_server_setup()
 {
   server.on("/", HTTP_GET, handleRoot);
   server.on("/anim", HTTP_POST, handleAnim);
   server.on("/palette", HTTP_POST, handlePal);
-  server.on("/brightness", handleBrightness);
-  server.on("/fps", handleFps);
+  server.on("/brightness", HTTP_POST, handleBrightness);
+  server.on("/fps", HTTP_POST, handleFps);
+  server.on("/system", HTTP_POST, handleSystem);
+  server.on("/system", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, "text/plain", String(SYSTEM_ON));
+  });
+
   server.onNotFound(handleNotFound);
   server.begin();
   debug_println("HTTP server started");
