@@ -14,6 +14,7 @@
 #include "anim_orbit.h"
 #include "anim_sparkles.h"
 #include "anim_travelers.h"
+#include "anim_weewoo.h"
 #include "anim_debug1.h"
 #include "data.h"
 #include "color_palette.h"
@@ -153,6 +154,8 @@ Animation *getAnimation(String newAnimation)
     anim = new AnimationCylon();
   else if (newAnimation == "cylonVert")
     anim = new AnimationCylonVert();
+  else if (newAnimation == "weewoo")
+    anim = new AnimationWeewoo();
   else if (newAnimation == "debug1")
     anim = new AnimationDebug1();
   else

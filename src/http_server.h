@@ -34,6 +34,7 @@ const char htmlTemplate[] PROGMEM = "\
         <input type=\"submit\" name=\"anim\" value=\"explosion\">\
         <input type=\"submit\" name=\"anim\" value=\"cylon\">\
         <input type=\"submit\" name=\"anim\" value=\"cylonVert\">\
+        <input type=\"submit\" name=\"anim\" value=\"weewoo\">\
         <input type=\"submit\" name=\"anim\" value=\"debug1\">\
         </form>\
     </div>\
