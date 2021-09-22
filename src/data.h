@@ -108,5 +108,6 @@ const int STEERING_CW = 1;
 const int STEERING_CCW = 2;
 const int STEERING_PATH = 3;
 const int STEERING_PATH_PINGPONG = 4;
+const int STEERING_PATH_REPEAT = 5;
 
 #endif

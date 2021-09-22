@@ -47,6 +47,13 @@ public:
     this->steering = steering;
     std::copy(path.begin(), path.end(), this->path);
     this->pathSize = pathSize;
+    for (int i = 0; i < pathSize; i++)
+    {
+      if (this->path[i] == segmentNum)
+      {
+        this->pathPos = i;
+      }
+    }
   }
 
   void move()
@@ -68,28 +75,31 @@ public:
     debug_println(" hopping");
     switch (steering)
     {
-      case STEERING_RAND:
-        hopRandom();
-        break;
-      case STEERING_CW:
-        hopClockWise();
-        break;
-      case STEERING_CCW:
-        hopCounterClockWise();
-        break;
-      case STEERING_PATH:
-        hopPath();
-        break;
-      case STEERING_PATH_PINGPONG:
-        hopPathPingPong();
-        break;
+    case STEERING_RAND:
+      hopRandom();
+      break;
+    case STEERING_CW:
+      hopClockWise();
+      break;
+    case STEERING_CCW:
+      hopCounterClockWise();
+      break;
+    case STEERING_PATH:
+      hopPath();
+      break;
+    case STEERING_PATH_REPEAT:
+      hopPathRepeat();
+      break;
+    case STEERING_PATH_PINGPONG:
+      hopPathPingPong();
+      break;
     }
   }
 
   void hopRandom()
   {
     int vertex = (animDir == segment.Dir) ? segment.HighVertex : segment.LowVertex;
-    while(true)
+    while (true)
     {
       int nextSegNum = verticies[vertex][random(0, 6)];
       if (nextSegNum != -1 && nextSegNum != segment.Num)
@@ -167,8 +177,7 @@ public:
     {
       pathPos = 0;
       int nextSegNum = path[pathPos];
-      Segment nextSegment = segments[nextSegNum];
-      int vertex = (animDir == nextSegment.Dir) ? nextSegment.LowVertex : nextSegment.HighVertex;
+      int vertex = (animDir == segment.Dir) ? segment.HighVertex : segment.LowVertex;
       finishHop(vertex, nextSegNum);
       return;
     }
@@ -178,16 +187,16 @@ public:
 
   void revereseArray(int arr[], int size)
   {
-      int start = 0;
-      int end = size - 1;
-      while (start < end)
-      {
-          int temp = arr[start];
-          arr[start] = arr[end];
-          arr[end] = temp;
-          start++;
-          end--;
-      }
+    int start = 0;
+    int end = size - 1;
+    while (start < end)
+    {
+      int temp = arr[start];
+      arr[start] = arr[end];
+      arr[end] = temp;
+      start++;
+      end--;
+    }
   }
 
   void hopPathPingPong()
@@ -200,7 +209,7 @@ public:
       debug_print("newdir: ");
       debug_print(animDir);
       debug_print(" newpath: ");
-      for(int i = 0; i < pathSize; i++)
+      for (int i = 0; i < pathSize; i++)
       {
         debug_print(path[i]);
         debug_print(",");
@@ -214,19 +223,18 @@ public:
 
   void finishHop(int vertex, int nextSegNum)
   {
-        segment = segments[nextSegNum];
-        if (vertex == segment.LowVertex)
-        {
-          pos = segment.LowLed;
-          animDir = segment.Dir;
-        }
-        else
-        {
-          pos = segment.HighLed;
-          animDir = segment.Dir == DIR_E ? DIR_W : DIR_E;
-        }
+    segment = segments[nextSegNum];
+    if (vertex == segment.LowVertex)
+    {
+      pos = segment.LowLed;
+      animDir = segment.Dir;
+    }
+    else
+    {
+      pos = segment.HighLed;
+      animDir = segment.Dir == DIR_E ? DIR_W : DIR_E;
+    }
   }
-
 };
 
 #endif
