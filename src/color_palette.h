@@ -18,8 +18,10 @@ DEFINE_GRADIENT_PALETTE(lavaGp){
 };
 
 DEFINE_GRADIENT_PALETTE(forestGp){
-    0, 0, 128, 0,      // CRGB::Green
-    255, 144, 238, 144 // CRGB::LightGreen
+    0, 0, 100, 0,     // CRGB::DarkGreen
+    85, 34, 139, 34,  // CRGB::ForestGreen
+    170, 124, 252, 0, // CRGB::LawnGreen
+    255, 0, 128, 0,   // CRGB::Green
 };
 
 DEFINE_GRADIENT_PALETTE(jokerFixedGp){
