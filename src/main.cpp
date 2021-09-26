@@ -12,6 +12,7 @@
 #include "anim_cylonvert.h"
 #include "anim_explosion.h"
 #include "anim_orbit.h"
+#include "anim_slowfade.h"
 #include "anim_sparkles.h"
 #include "anim_travelers.h"
 #include "anim_weewoo.h"
@@ -161,6 +162,8 @@ Animation *getAnimation(String newAnimation)
     anim = new AnimationCylon();
   else if (newAnimation == "cylonVert")
     anim = new AnimationCylonVert();
+  else if (newAnimation == "slowFade")
+    anim = new AnimationSlowFade();
   else if (newAnimation == "weewoo")
     anim = new AnimationWeewoo();
   else if (newAnimation == "debug1")
