@@ -6,6 +6,9 @@
 
 #include "settings.h"
 
+//------------ forward declarations ----------//
+String toHexString(CRGB color);
+
 AsyncWebServer server(80);
 
 char message[100];
@@ -34,6 +37,7 @@ const char htmlTemplate[] PROGMEM = "\
         <input type=\"submit\" name=\"anim\" value=\"explosion\">\
         <input type=\"submit\" name=\"anim\" value=\"cylon\">\
         <input type=\"submit\" name=\"anim\" value=\"cylonVert\">\
+        <input type=\"submit\" name=\"anim\" value=\"slowFade\">\
         <input type=\"submit\" name=\"anim\" value=\"weewoo\">\
         <input type=\"submit\" name=\"anim\" value=\"debug1\">\
         </form>\
@@ -41,14 +45,20 @@ const char htmlTemplate[] PROGMEM = "\
     <div class=\"section\">\
         <h2>Palette</h2>\
         <form method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"/palette\">\
-        <input type=\"submit\" name=\"palette\" value=\"random\">\
-        <input type=\"submit\" name=\"palette\" value=\"blue\">\
-        <input type=\"submit\" name=\"palette\" value=\"lava\">\
-        <input type=\"submit\" name=\"palette\" value=\"forest\">\
-        <input type=\"submit\" name=\"palette\" value=\"party\">\
-        <input type=\"submit\" name=\"palette\" value=\"joker\">\
-        <input type=\"submit\" name=\"palette\" value=\"bluePurp\">\
-        <input type=\"submit\" name=\"palette\" value=\"royal\">\
+          <input type=\"submit\" name=\"palette\" value=\"random\">\
+          <input type=\"submit\" name=\"palette\" value=\"blue\">\
+          <input type=\"submit\" name=\"palette\" value=\"lava\">\
+          <input type=\"submit\" name=\"palette\" value=\"forest\">\
+          <input type=\"submit\" name=\"palette\" value=\"party\">\
+          <input type=\"submit\" name=\"palette\" value=\"joker\">\
+          <input type=\"submit\" name=\"palette\" value=\"bluePurp\">\
+          <input type=\"submit\" name=\"palette\" value=\"royal\">\
+          <input type=\"submit\" name=\"palette\" value=\"customF\">\
+        </form>\
+        <form method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"/updatePaletteCustomFixed\">\
+          <input type=\"color\" name=\"color1\" value=\"%CUSTOM_FIXED_1%\">\
+          <input type=\"color\" name=\"color2\" value=\"%CUSTOM_FIXED_2%\">\
+          <input type=\"submit\" value=\"Update\">\
         </form>\
     </div>\
     <div class=\"section\">\
@@ -88,6 +98,10 @@ String htmlProcessor(const String &var)
     return String(FRAMES_PER_SECOND);
   if (var == "SYSTEM_ON")
     return String(SYSTEM_ON ? "on" : "off");
+  if (var == "CUSTOM_FIXED_1")
+    return toHexString(customFixed1);
+  if (var == "CUSTOM_FIXED_2")
+    return toHexString(customFixed2);
   return String();
 }
 
@@ -104,21 +118,20 @@ void handleNotFound(AsyncWebServerRequest *request)
 
 void handleAnim(AsyncWebServerRequest *request)
 {
-  changeAnimation = true;
-
   String value = request->getParam("anim", true)->value();
   sprintf(changeAnimationValue, "%s", value);
   sprintf(message, "Changed animation to %s", value);
+  changeAnimation = true;
 
   request->redirect("/");
 }
 
 void handlePal(AsyncWebServerRequest *request)
 {
-  changePalette = true;
   String value = request->getParam("palette", true)->value();
   sprintf(changePaletteValue, "%s", value);
   sprintf(message, "Changed palette to %s", value);
+  changePalette = true;
   request->redirect("/");
 }
 
@@ -156,6 +169,26 @@ void handleFps(AsyncWebServerRequest *request)
   request->redirect("/");
 }
 
+String toHexString(CRGB color) {
+    // r, g, b -> "#RRGGBB"
+    char output[8];
+    sprintf(output,"#%02X%02X%02X", color.r, color.g, color.b);
+    return String(output);
+}
+
+void handleUpdatePalCustomFixed(AsyncWebServerRequest *request)
+{
+  String color1str = "0x" + request->getParam("color1", true)->value().substring(1);
+  String color2str = "0x" + request->getParam("color2", true)->value().substring(1);
+
+  customFixed1 = CRGB(strtol(color1str.c_str(), NULL, 16));
+  customFixed2 = CRGB(strtol(color2str.c_str(), NULL, 16));
+  changeCustomFixedColor = true;
+
+  sprintf(message, "Changed custom palette to %s %s", color1str, color2str);
+  request->redirect("/");
+}
+
 void handleSystem(AsyncWebServerRequest *request)
 {
   if (request->hasParam("on", true))
@@ -176,6 +209,7 @@ void http_server_setup()
   server.on("/", HTTP_GET, handleRoot);
   server.on("/anim", HTTP_POST, handleAnim);
   server.on("/palette", HTTP_POST, handlePal);
+  server.on("/updatePaletteCustomFixed", HTTP_POST, handleUpdatePalCustomFixed);
   server.on("/brightness", HTTP_POST, handleBrightness);
   server.on("/fps", HTTP_POST, handleFps);
   server.on("/system", HTTP_POST, handleSystem);

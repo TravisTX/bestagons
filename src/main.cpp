@@ -111,6 +111,13 @@ void loop()
     changePaletteValue[0] = 0;
   }
 
+  if (changeCustomFixedColor)
+  {
+    colorPalette->SetCustomFixedColor(customFixed1, customFixed2);
+    changeCustomFixedColor = false;
+    animation->setup(leds, colorPalette);
+  }
+
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }

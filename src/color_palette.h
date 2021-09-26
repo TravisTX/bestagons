@@ -42,6 +42,12 @@ DEFINE_GRADIENT_PALETTE(royalFixedGp){
     255, 255, 165, 0  // CRGB::Orange
 };
 
+DEFINE_GRADIENT_PALETTE(customFixedGp){
+    0, 0, 0, 255,     // CRGB::Blue
+    128, 128, 0, 128, // CRGB::Purple
+    255, 0, 0, 255    // CRGB::Blue
+};
+
 class ColorPalette
 {
 private:
@@ -58,26 +64,31 @@ public:
   CRGBPalette16 jokerFixedPal = jokerFixedGp;
   CRGBPalette16 bluePurpFixedPal = bluePurpFixedGp;
   CRGBPalette16 royalFixedPal = royalFixedGp;
+  CRGBPalette16 customFixedPal = customFixedGp;
 
-  const int numPalettes = 7;
-  CRGBPalette16 allPalettes[7] = {
+  const int numPalettes = 8;
+  CRGBPalette16 allPalettes[8] = {
       bluePal,
       lavaPal,
       forestPal,
       partyPal,
       jokerFixedPal,
       bluePurpFixedPal,
-      royalFixedPal};
+      royalFixedPal,
+      customFixedPal
+      };
 
   // for most palettes, we're fine with the default behavior of
   // arbitrarily picking colors out of the gradient.
   // however, for these ones, we have a fixed number of steps
   // (currently always 2 steps)
-  const int numFixedPalettes = 3;
-  CRGBPalette16 allFixedPalettes[3] = {
+  const int numFixedPalettes = 4;
+  CRGBPalette16 allFixedPalettes[4] = {
       jokerFixedPal,
       bluePurpFixedPal,
-      royalFixedPal};
+      royalFixedPal,
+      customFixedPal
+      };
 
   ColorPalette()
   {
@@ -100,6 +111,8 @@ public:
       currentPalette = bluePurpFixedPal;
     else if (paletteName == "royal")
       currentPalette = royalFixedPal;
+    else if (paletteName == "customF")
+      currentPalette = customFixedPal;
     else
       currentPalette = allPalettes[random(0, numPalettes)];
 
@@ -119,6 +132,14 @@ public:
       steps = stepOverride;
     debug_println(colorIndex += 255 / steps);
     return ColorFromPalette(currentPalette, colorIndex, 255, NOBLEND);
+  }
+
+  void SetCustomFixedColor(CRGB color1, CRGB color2)
+  {
+    for(int i = 0; i < 16; i++)
+    {
+      customFixedPal.entries[i] = i % 2 == 0 ? color1 : color2;
+    }
   }
 };
 

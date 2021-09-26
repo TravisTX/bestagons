@@ -20,6 +20,9 @@ bool changeAnimation = false;
 char changeAnimationValue[15] = "";
 bool changePalette = false;
 char changePaletteValue[10] = "";
+bool changeCustomFixedColor = false;
+CRGB customFixed1;
+CRGB customFixed2;
 
 #define debug_begin(...) do { if (DEBUG) { Serial.begin(__VA_ARGS__); while(!Serial); }} while (0)
 #define debug_print(...) do { if (DEBUG) Serial.print(__VA_ARGS__); } while (0)
